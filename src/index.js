@@ -28,21 +28,44 @@ const authenticateSalesforce = async () => {
 };
 
 // Get object and field level security for a user
-app.get('/security-schema', async (req, res) => {
+app.get('/security-schema/:userId?', async (req, res) => {
   try {
     // Authenticate with Salesforce
     const conn = await authenticateSalesforce();
 
-    // Retrieve user details to get profile/permission set
-    const userInfo = await conn.identity();
+    // Get the user ID from the parameter or use the authenticated user's ID
+    let targetUserId;
+    let userInfo;
 
-    // Fetch object and field permissions
+    if (req.params.userId) {
+      // If user ID is provided, verify the user exists
+      try {
+        const userQuery = await conn.query(`SELECT Id, Username FROM User WHERE Id = '${req.params.userId}'`);
+        if (!userQuery.records.length) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        targetUserId = req.params.userId;
+        userInfo = userQuery.records[0];
+      } catch (error) {
+        console.error('Error querying user:', error);
+        return res.status(400).json({ 
+          error: 'Invalid user ID', 
+          details: error.message 
+        });
+      }
+    } else {
+      // Use the authenticated user's ID
+      userInfo = await conn.identity();
+      targetUserId = userInfo.user_id;
+    }
+
+    // Fetch object and field permissions for the target user
     const objectPermissions = await conn.query(
       `SELECT SobjectType, PermissionsCreate, PermissionsDelete, PermissionsEdit, PermissionsRead 
        FROM ObjectPermissions 
        WHERE ParentId IN (
          SELECT PermissionSetId FROM PermissionSetAssignment 
-         WHERE AssigneeId = '${userInfo.user_id}'
+         WHERE AssigneeId = '${targetUserId}'
        )`
     );
 
@@ -51,7 +74,7 @@ app.get('/security-schema', async (req, res) => {
        FROM FieldPermissions 
        WHERE ParentId IN (
          SELECT PermissionSetId FROM PermissionSetAssignment 
-         WHERE AssigneeId = '${userInfo.user_id}'
+         WHERE AssigneeId = '${targetUserId}'
        )`
     );
 
@@ -158,8 +181,8 @@ app.get('/security-schema', async (req, res) => {
     }, null, 2));
 
     res.json({
-      userId: userInfo.user_id,
-      username: userInfo.username,
+      userId: targetUserId,
+      username: userInfo.Username,
       permissions: objectsWithPermissions
     });
   } catch (error) {

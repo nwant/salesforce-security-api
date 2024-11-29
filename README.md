@@ -41,9 +41,12 @@ npm start
 
 ### API Endpoints
 
-#### GET /security-schema
+#### GET /security-schema[/:userId]
 
-Retrieves the security schema for the authenticated user.
+Retrieves the security schema for a Salesforce user. If no user ID is provided, returns permissions for the authenticated user.
+
+**Parameters:**
+- `userId` (optional): The Salesforce User ID to retrieve permissions for
 
 **Response Format:**
 ```json
@@ -80,6 +83,12 @@ Object Permissions:
 Field Permissions:
 - `r`: Read
 - `w`: Write
+
+**Error Responses:**
+- `404 Not Found`: User ID does not exist
+- `400 Bad Request`: Invalid user ID format
+- `401 Unauthorized`: Authentication failed
+- `500 Internal Server Error`: Server error
 
 **Notes:**
 - Objects and fields are only included if the user has at least one permission
