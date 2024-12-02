@@ -1,0 +1,118 @@
+{
+  "info": {
+    "name": "Salesforce Security API",
+    "description": "Collection for testing the Salesforce Security Microservice endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Security Schema",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/security-schema",
+          "host": ["{{baseUrl}}"],
+          "path": ["security-schema"]
+        },
+        "description": "Retrieves the security schema for the authenticated user"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Security Schema for User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/security-schema/:userId",
+          "host": ["{{baseUrl}}"],
+          "path": ["security-schema", ":userId"],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "{{testUserId}}",
+              "description": "Salesforce User ID"
+            }
+          ]
+        },
+        "description": "Retrieves the security schema for a specific user"
+      },
+      "response": []
+    },
+    {
+      "name": "Check Record Access",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"recordIds\": [\n    \"{{testRecordId1}}\",\n    \"{{testRecordId2}}\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/record-access",
+          "host": ["{{baseUrl}}"],
+          "path": ["record-access"]
+        },
+        "description": "Check access permissions for multiple Salesforce records for the authenticated user"
+      },
+      "response": []
+    },
+    {
+      "name": "Check Record Access for User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"recordIds\": [\n    \"{{testRecordId1}}\",\n    \"{{testRecordId2}}\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/record-access/:userId",
+          "host": ["{{baseUrl}}"],
+          "path": ["record-access", ":userId"],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "{{testUserId}}",
+              "description": "Salesforce User ID"
+            }
+          ]
+        },
+        "description": "Check access permissions for multiple Salesforce records for a specific user"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "testUserId",
+      "value": "",
+      "description": "Salesforce User ID for testing"
+    },
+    {
+      "key": "testRecordId1",
+      "value": "001xx000003DGb2AAG",
+      "description": "Salesforce Record ID 1 for testing"
+    },
+    {
+      "key": "testRecordId2",
+      "value": "003xx000004TK8hAAG",
+      "description": "Salesforce Record ID 2 for testing"
+    }
+  ]
+}
