@@ -1,4 +1,4 @@
-# Salesforce Security Microservice
+# Salesforce Security API
 
 A Node.js microservice that retrieves permissions for a Salesforce user.
 
